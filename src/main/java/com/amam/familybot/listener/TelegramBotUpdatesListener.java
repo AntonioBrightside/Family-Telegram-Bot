@@ -30,6 +30,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener{
                 long chatId = update.message().chat().id();
                 String messageText = update.message().text();
                 telegramBot.execute(new SendMessage(chatId, "Hello!"));
+                System.out.println("For test commit");
             });
         } catch (Exception e) {
             e.getStackTrace();
