@@ -9,7 +9,7 @@
 
     <changeSet id="create-sleep_time-table.1" author="brightside">
         <createTable tableName="sleep_time">
-            <column name="id" type="SERIAL" autoIncrement="true">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
             <column name="date" type="DATE">
@@ -25,5 +25,14 @@
         </createTable>
 
     </changeSet>
+
+    <changeSet id="2" author="brightside">
+        <addColumn tableName="sleep_time">
+            <column name="telegram_message_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>
