@@ -1,6 +1,7 @@
 package com.amam.familybot.entity;
 
 import jakarta.persistence.*;
+import org.springframework.lang.Nullable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,9 +24,11 @@ public class SleepTime {
     @Column(name = "fall_asleep_time")
     private LocalTime fallAsleepTime;
 
+    @Nullable
     @Column(name = "wake_up_time")
     private LocalTime wakeUpTime;
 
+    @Nullable
     @Column(name = "sleep_time")
     private LocalTime sleepTime;
 
