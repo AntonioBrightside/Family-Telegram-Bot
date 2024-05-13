@@ -12,10 +12,7 @@ import java.util.Objects;
 public class SleepTime {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @Column(name = "telegram_message_id")
+    @Column(name = "message_id")
     private long messageId;
 
     @Column(name = "date")
@@ -31,14 +28,6 @@ public class SleepTime {
     @Nullable
     @Column(name = "sleep_time")
     private LocalTime sleepTime;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public long getMessageId() {
         return messageId;
@@ -85,19 +74,18 @@ public class SleepTime {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SleepTime sleepTime1 = (SleepTime) o;
-        return id == sleepTime1.id && messageId == sleepTime1.messageId && Objects.equals(date, sleepTime1.date) && Objects.equals(fallAsleepTime, sleepTime1.fallAsleepTime) && Objects.equals(wakeUpTime, sleepTime1.wakeUpTime) && Objects.equals(sleepTime, sleepTime1.sleepTime);
+        return messageId == sleepTime1.messageId && Objects.equals(date, sleepTime1.date) && Objects.equals(fallAsleepTime, sleepTime1.fallAsleepTime) && Objects.equals(wakeUpTime, sleepTime1.wakeUpTime) && Objects.equals(sleepTime, sleepTime1.sleepTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, messageId, date, fallAsleepTime, wakeUpTime, sleepTime);
+        return Objects.hash(messageId, date, fallAsleepTime, wakeUpTime, sleepTime);
     }
 
     @Override
     public String toString() {
         return "SleepTime{" +
-                "id=" + id +
-                ", messageId=" + messageId +
+                "messageId=" + messageId +
                 ", date=" + date +
                 ", fallAsleepTime=" + fallAsleepTime +
                 ", wakeUpTime=" + wakeUpTime +
