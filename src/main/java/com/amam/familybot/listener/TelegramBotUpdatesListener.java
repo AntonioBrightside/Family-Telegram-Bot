@@ -39,11 +39,15 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 String messageText = update.message().text();
                 long messageId = update.message().messageId();
 
+                long replyMessageId = 0L;
+                if (update.message().replyToMessage() != null) {
+                    replyMessageId = update.message().replyToMessage().messageId();
+                }
+
                 // To check if the user is allowed to use bot
                 if (Arrays.stream(allowedUsers).
                         anyMatch(id -> update.message().chat().id() == id)) {
-                    telegramBot.execute(new SendMessage(chatId, "Послушал тебя успешно, сын мой"));
-                    sendMessage(chatId, sleepTimeService.parseUserMessage(messageText, messageId));
+                    sendMessage(chatId, sleepTimeService.parseUserMessage(messageText, messageId, replyMessageId));
                 } else {
                     sendMessage(chatId, "доступ запрещён");
                 }
