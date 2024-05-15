@@ -1,10 +1,9 @@
 package com.amam.familybot.service;
 
 import com.amam.familybot.entity.SleepTime;
-import com.amam.familybot.exception.SleepTimeException;
+import com.amam.familybot.exception.IncorrectFormatMessageException;
 import com.amam.familybot.exception.SleepTimeNotFoundException;
 import com.amam.familybot.repository.SleepTimeRepository;
-import org.springframework.cglib.core.Local;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,32 +37,32 @@ public class SleepTimeService {
         Matcher matcherDateTime = patternDateTime.matcher(userMessage);
         Matcher matcherReply = patternReply.matcher(userMessage);
 
-        if (matcherTime.matches()) {
-            LocalTime fallAsleepTime = LocalTime.parse(matcherTime.group(1), DateTimeFormatter.ofPattern("HH:mm"));
-            return save(messageId, LocalDate.now(), fallAsleepTime, null, replyMessageId);
-        }
-
+        // To save wakeUpTime
         if (replyMessageId != 0L && matcherReply.matches()) {
             LocalTime wakeUpTime = LocalTime.parse(userMessage, DateTimeFormatter.ofPattern("HH:mm"));
             return save(messageId, null, null, wakeUpTime, replyMessageId);
         }
 
-        if (hasDate(userMessage)) {
-            Matcher matcher = patternDateTime.matcher(userMessage);
-            // TODO: Code
+        // To init new record in DB (user's message w/o date) and save fallAsleepTime
+        if (matcherTime.matches()) {
+            LocalTime fallAsleepTime = LocalTime.parse(matcherTime.group(1), DateTimeFormatter.ofPattern("HH:mm"));
+            return save(messageId, LocalDate.now(), fallAsleepTime, null, replyMessageId);
         }
 
-        return "Done";
-    }
+        // To init new record in DB (user's message with date) and save fallAsleepTime
+        if (matcherDateTime.matches()) {
+            LocalDate date = LocalDate.parse("%s.%s".formatted(matcherDateTime.group(1),
+                    LocalDate.now().getYear()), DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            LocalTime fallAsleepTime = LocalTime.parse(matcherDateTime.group(2), DateTimeFormatter.ofPattern("HH:mm"));
+            return save(messageId, date, fallAsleepTime, null, replyMessageId);
+        }
 
-    // Может можно полиморфизм использовать как-то?
-    private Boolean hasDate(String userMessage) {
-        return patternDateTime.matcher(userMessage).matches();
+        throw new IncorrectFormatMessageException();
     }
 
     @Transactional
     private String save(long messageId, @Nullable LocalDate date, @Nullable LocalTime fallASleepTime,
-                      @Nullable LocalTime wakeUpTime, long replyMessageId) {
+                        @Nullable LocalTime wakeUpTime, long replyMessageId) {
 
         SleepTime sleep = new SleepTime();
 

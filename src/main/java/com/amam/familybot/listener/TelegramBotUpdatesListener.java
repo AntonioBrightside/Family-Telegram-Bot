@@ -47,7 +47,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 // To check if the user is allowed to use bot
                 if (Arrays.stream(allowedUsers).
                         anyMatch(id -> update.message().chat().id() == id)) {
-                    telegramBot.execute(new SendMessage(chatId, "Послушал тебя успешно, сын мой"));
                     sendMessage(chatId, sleepTimeService.parseUserMessage(messageText, messageId, replyMessageId));
                 } else {
                     sendMessage(chatId, "доступ запрещён");
