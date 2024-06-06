@@ -1,7 +1,7 @@
 package com.amam.familybot.listener;
 
+import com.amam.familybot.command.Command;
 import com.amam.familybot.exception.IncorrectFormatMessageException;
-import com.amam.familybot.exception.SleepTimeNotFoundException;
 import com.amam.familybot.exception.SleepTimePeriodException;
 import com.amam.familybot.service.SleepTimeService;
 import com.pengrad.telegrambot.TelegramBot;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener {
@@ -49,10 +50,15 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
                 try {
                     // To check if the user is allowed to use bot
-                    if (Arrays.stream(allowedUsers).
-                            anyMatch(id -> update.message().chat().id() == id)) {
+                    if (Arrays.stream(allowedUsers).anyMatch(id -> update.message().chat().id() == id)) {
+
+                        // To check command "\yesterday" TODO: Хотелось бы сделать в одну строку метчинг команды и action
+                        if (messageText.equals(Command.YESTERDAY.getTextCommand())) {
+                            sendMessage(chatId, Command.YESTERDAY.action());
+                        } else {
+                            sendMessage(chatId, sleepTimeService.parseUserMessage(messageText, messageId, replyMessageId));
+                        }
 //                        sendMessage(chatId, sleepTimeService.getYesterdaySleepTime());
-                        sendMessage(chatId, sleepTimeService.parseUserMessage(messageText, messageId, replyMessageId));
                     } else {
                         sendMessage(chatId, "доступ запрещён");
                     }

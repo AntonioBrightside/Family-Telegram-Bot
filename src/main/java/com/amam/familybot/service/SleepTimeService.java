@@ -129,12 +129,10 @@ public class SleepTimeService {
      */
     public String getYesterdaySleepTime() {
         Optional<String> sleepTime = sleepTimeRepository.findSleepTimeByDate(LocalDate.now().minusDays(1));
-        sleepTime.map(value -> {
+        return sleepTime.map(value -> {
             String[] splitSleepTime = sleepTime.get().split(" ");
             return String.format("%s:%s", splitSleepTime[6], splitSleepTime[8]);
         }).orElseThrow(SleepTimePeriodException::new);
-
-        return "Need to send text here";
     }
 
 
