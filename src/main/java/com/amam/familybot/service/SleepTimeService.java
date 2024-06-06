@@ -3,6 +3,7 @@ package com.amam.familybot.service;
 import com.amam.familybot.entity.SleepTime;
 import com.amam.familybot.exception.IncorrectFormatMessageException;
 import com.amam.familybot.exception.SleepTimeNotFoundException;
+import com.amam.familybot.exception.SleepTimePeriodException;
 import com.amam.familybot.repository.SleepTimeRepository;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,13 @@ public class SleepTimeService {
         this.sleepTimeRepository = sleepTimeRepository;
     }
 
-
+    /**
+     * Parse user's message due to regex and record it to DB
+     * @param userMessage user test message
+     * @param messageId ID message
+     * @param replyMessageId the ID of replied message
+     * @return bot status
+     */
     public String parseUserMessage(String userMessage, long messageId, long replyMessageId) {
 
         Matcher matcherTime = patternTime.matcher(userMessage);
@@ -60,6 +67,15 @@ public class SleepTimeService {
         throw new IncorrectFormatMessageException();
     }
 
+    /**
+     * Save the record to DB. Save in two stages: fall asleep time and wake-up time.
+     * @param messageId message ID
+     * @param date date of sleep
+     * @param fallASleepTime fall asleep time
+     * @param wakeUpTime wake-up time
+     * @param replyMessageId the ID of replied message
+     * @return
+     */
     @Transactional
     private String save(long messageId, @Nullable LocalDate date, @Nullable LocalTime fallASleepTime,
                         @Nullable LocalTime wakeUpTime, long replyMessageId) {
@@ -70,11 +86,8 @@ public class SleepTimeService {
             sleep = sleepTimeRepository.findByMessageId(replyMessageId)
                     .orElseThrow(SleepTimeNotFoundException::new);
 
-            long sleepTimeMinutes = MINUTES.between(sleep.getFallAsleepTime(), wakeUpTime);
-            LocalTime sleepTimeHm = LocalTime.MIN.plus(Duration.ofMinutes(sleepTimeMinutes));
-
             sleep.setWakeUpTime(wakeUpTime);
-            sleep.setSleepTime(sleepTimeHm);
+            sleep.setSleepTime(getSleepTimeInHmFormat(sleep.getFallAsleepTime(), wakeUpTime));
 
             sleepTimeRepository.save(sleep);
             return "В запись добавлено время пробуждения";
@@ -90,9 +103,38 @@ public class SleepTimeService {
         }
     }
 
+    /**
+     * Find message by message ID
+     * @param messageId
+     * @return record from DB or empty Optional
+     */
     private Optional<SleepTime> findMessageId(long messageId) {
         return sleepTimeRepository.findByMessageId(messageId);
     }
+
+    /**
+     * Count sleep time and return it in necessary format
+     * @param fallAsleepTime fall asleep time in 'HH:mm' format
+     * @param wakeUpTime wake-up time in 'HH:mm' format
+     * @return sleep time in 'HH:mm' format
+     */
+    private LocalTime getSleepTimeInHmFormat(LocalTime fallAsleepTime, LocalTime wakeUpTime) {
+        long sleepTimeMinutes = MINUTES.between(fallAsleepTime, wakeUpTime);
+        return LocalTime.MIN.plus(Duration.ofMinutes(sleepTimeMinutes));
+    }
+
+    /**
+     * Returns sleepy timefor yesterday
+     * @return sleep time
+     */
+    public String getYesterdaySleepTime() {
+        Optional<String> sleepTime = sleepTimeRepository.findSleepTimeByDate(LocalDate.now().minusDays(1));
+        return sleepTime.map(value -> {
+            String[] splitSleepTime = sleepTime.get().split(" ");
+            return String.format("Время сна карапуза вчера было %s:%s", splitSleepTime[6], splitSleepTime[8]);
+        }).orElseThrow(SleepTimePeriodException::new);
+    }
+
 
 
 }
