@@ -3,11 +3,13 @@ package com.amam.familybot.service;
 import com.amam.familybot.entity.SleepTime;
 import com.amam.familybot.exception.IncorrectFormatMessageException;
 import com.amam.familybot.exception.SleepTimeNotFoundException;
+import com.amam.familybot.exception.SleepTimePeriodException;
 import com.amam.familybot.repository.SleepTimeRepository;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -121,6 +123,21 @@ public class SleepTimeService {
         long sleepTimeMinutes = MINUTES.between(fallAsleepTime, wakeUpTime);
         return LocalTime.MIN.plus(Duration.ofMinutes(sleepTimeMinutes));
     }
+
+    /**
+     * Returns sleepy timefor yesterday
+     * @return sleep time
+     */
+    public String getYesterdaySleepTime() {
+        Optional<String> sleepTime = sleepTimeRepository.findSleepTimeByDateTest(LocalDate.now().minusDays(1));
+        sleepTime.map(value -> {
+            String[] splitSleepTime = sleepTime.get().split(" ");
+            return String.format("%s:%s", splitSleepTime[6], splitSleepTime[8]);
+        }).orElseThrow(SleepTimePeriodException::new);
+
+        return "Need to send text here";
+    }
+
 
 
 }

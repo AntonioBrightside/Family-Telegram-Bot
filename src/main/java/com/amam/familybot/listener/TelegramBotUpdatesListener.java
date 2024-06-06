@@ -1,5 +1,8 @@
 package com.amam.familybot.listener;
 
+import com.amam.familybot.exception.IncorrectFormatMessageException;
+import com.amam.familybot.exception.SleepTimeNotFoundException;
+import com.amam.familybot.exception.SleepTimePeriodException;
 import com.amam.familybot.service.SleepTimeService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -44,13 +47,21 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                     replyMessageId = update.message().replyToMessage().messageId();
                 }
 
-                // To check if the user is allowed to use bot
-                if (Arrays.stream(allowedUsers).
-                        anyMatch(id -> update.message().chat().id() == id)) {
-                    sendMessage(chatId, sleepTimeService.parseUserMessage(messageText, messageId, replyMessageId));
-                } else {
-                    sendMessage(chatId, "доступ запрещён");
+                try {
+                    // To check if the user is allowed to use bot
+                    if (Arrays.stream(allowedUsers).
+                            anyMatch(id -> update.message().chat().id() == id)) {
+//                        sendMessage(chatId, sleepTimeService.getYesterdaySleepTime());
+                        sendMessage(chatId, sleepTimeService.parseUserMessage(messageText, messageId, replyMessageId));
+                    } else {
+                        sendMessage(chatId, "доступ запрещён");
+                    }
+                } catch (IncorrectFormatMessageException e) {
+                    sendMessage(chatId, e.getMessage());
+                } catch (SleepTimePeriodException e) {
+                    sendMessage(chatId, e.getMessage());
                 }
+
             });
         } catch (Exception e) {
             e.getStackTrace();
