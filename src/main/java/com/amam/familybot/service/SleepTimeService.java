@@ -9,7 +9,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -129,7 +128,7 @@ public class SleepTimeService {
      * @return sleep time
      */
     public String getYesterdaySleepTime() {
-        Optional<String> sleepTime = sleepTimeRepository.findSleepTimeByDateTest(LocalDate.now().minusDays(1));
+        Optional<String> sleepTime = sleepTimeRepository.findSleepTimeByDate(LocalDate.now().minusDays(1));
         sleepTime.map(value -> {
             String[] splitSleepTime = sleepTime.get().split(" ");
             return String.format("%s:%s", splitSleepTime[6], splitSleepTime[8]);
