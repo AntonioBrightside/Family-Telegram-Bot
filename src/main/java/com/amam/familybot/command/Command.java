@@ -5,9 +5,12 @@ import com.amam.familybot.service.SleepTimeService;
 
 public enum Command {
 
-//    START("/start") {
-//
-//    },
+    START("/start") {
+        @Override
+        public String action() {
+            return "Добро пожаловать, хозяин. Приказывай";
+        }
+    },
 //    HELP("/help") {
 //
 //    },
@@ -27,10 +30,18 @@ public enum Command {
         this.textCommand = textCommand;
     }
 
+    /**
+     * To inject SleepTimeService
+     * @param service SleepTimeService
+     */
     public static void setSleepTimeService(SleepTimeService service) {
         sleepTimeService = service;
     }
 
+    /**
+     *
+     * @return Name of the command
+     */
     public String getTextCommand() {
         return textCommand;
     }

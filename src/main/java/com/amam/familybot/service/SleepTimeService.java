@@ -131,7 +131,7 @@ public class SleepTimeService {
         Optional<String> sleepTime = sleepTimeRepository.findSleepTimeByDate(LocalDate.now().minusDays(1));
         return sleepTime.map(value -> {
             String[] splitSleepTime = sleepTime.get().split(" ");
-            return String.format("%s:%s", splitSleepTime[6], splitSleepTime[8]);
+            return String.format("Время сна карапуза вчера было %s:%s", splitSleepTime[6], splitSleepTime[8]);
         }).orElseThrow(SleepTimePeriodException::new);
     }
 
