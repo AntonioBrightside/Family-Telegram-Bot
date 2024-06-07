@@ -3,6 +3,8 @@ package com.amam.familybot.command;
 
 import com.amam.familybot.service.SleepTimeService;
 
+import java.time.LocalDate;
+
 public enum Command {
 
     START("/start") {
@@ -11,14 +13,40 @@ public enum Command {
             return "Добро пожаловать, хозяин. Приказывай";
         }
     },
-//    HELP("/help") {
-//
-//    },
+    HELP("/help") {
+        @Override
+        public String action() {
+            return """
+                    Основная функция бота - записывать, выдавать информацию по командам о количестве сна, оповещать пользователя по временному интервалу.
+                    Бот принимает команды в следующем формате:
+                    
+                        Запись:
+                            - время засыпания: 12:00 сон
+                            - время засыпания: 12:00 01.01 сон
+                            - время пробуждения: 13:00 (необходимо ответить на сообщение, в котором ребёнок заснул)
+                        
+                        Команды:
+                            - /yesterday - получить время сна ребёнка за вчерашний день
+                            
+                    Удачи!   
+                    """;
+        }
+
+    },
 
     YESTERDAY("/yesterday") {
         @Override
         public String action() {
-            return sleepTimeService.getYesterdaySleepTime();
+            LocalDate date = LocalDate.now().minusDays(1);
+            return sleepTimeService.getSleepTimeByDate(date);
+        }
+    },
+
+    TODAY("/today") {
+        @Override
+        public String action() {
+            LocalDate date = LocalDate.now();
+            return sleepTimeService.getSleepTimeByDate(date);
         }
     };
 

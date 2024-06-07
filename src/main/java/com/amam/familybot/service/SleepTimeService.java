@@ -33,8 +33,9 @@ public class SleepTimeService {
 
     /**
      * Parse user's message due to regex and record it to DB
-     * @param userMessage user test message
-     * @param messageId ID message
+     *
+     * @param userMessage    user test message
+     * @param messageId      ID message
      * @param replyMessageId the ID of replied message
      * @return bot status
      */
@@ -69,10 +70,11 @@ public class SleepTimeService {
 
     /**
      * Save the record to DB. Save in two stages: fall asleep time and wake-up time.
-     * @param messageId message ID
-     * @param date date of sleep
+     *
+     * @param messageId      message ID
+     * @param date           date of sleep
      * @param fallASleepTime fall asleep time
-     * @param wakeUpTime wake-up time
+     * @param wakeUpTime     wake-up time
      * @param replyMessageId the ID of replied message
      * @return
      */
@@ -105,6 +107,7 @@ public class SleepTimeService {
 
     /**
      * Find message by message ID
+     *
      * @param messageId
      * @return record from DB or empty Optional
      */
@@ -114,8 +117,9 @@ public class SleepTimeService {
 
     /**
      * Count sleep time and return it in necessary format
+     *
      * @param fallAsleepTime fall asleep time in 'HH:mm' format
-     * @param wakeUpTime wake-up time in 'HH:mm' format
+     * @param wakeUpTime     wake-up time in 'HH:mm' format
      * @return sleep time in 'HH:mm' format
      */
     private LocalTime getSleepTimeInHmFormat(LocalTime fallAsleepTime, LocalTime wakeUpTime) {
@@ -124,17 +128,17 @@ public class SleepTimeService {
     }
 
     /**
-     * Returns sleepy timefor yesterday
-     * @return sleep time
+     * Get Sleep time by Date
+     * @param date yesterday or today
+     * @return sum of sleep time by date
      */
-    public String getYesterdaySleepTime() {
-        Optional<String> sleepTime = sleepTimeRepository.findSleepTimeByDate(LocalDate.now().minusDays(1));
+    public String getSleepTimeByDate(LocalDate date) {
+        Optional<String> sleepTime = sleepTimeRepository.findSleepTimeByDate(date);
         return sleepTime.map(value -> {
             String[] splitSleepTime = sleepTime.get().split(" ");
-            return String.format("Время сна карапуза вчера было %s:%s", splitSleepTime[6], splitSleepTime[8]);
+            return String.format("%s:%s - Итоговое время сна за %s", splitSleepTime[6], splitSleepTime[8], date);
         }).orElseThrow(SleepTimePeriodException::new);
     }
-
 
 
 }
