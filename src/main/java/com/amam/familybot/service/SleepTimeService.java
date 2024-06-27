@@ -1,21 +1,29 @@
 package com.amam.familybot.service;
 
+import com.amam.familybot.dto.SleepTimeSummary;
 import com.amam.familybot.entity.SleepTime;
 import com.amam.familybot.exception.IncorrectFormatMessageException;
 import com.amam.familybot.exception.SleepTimeNotFoundException;
 import com.amam.familybot.exception.SleepTimePeriodException;
 import com.amam.familybot.repository.SleepTimeRepository;
+import org.hibernate.bytecode.internal.bytebuddy.BytecodeProviderImpl;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.postgresql.util.PGInterval;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.sql.Date;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 
@@ -129,6 +137,7 @@ public class SleepTimeService {
 
     /**
      * Get Sleep time by Date
+     *
      * @param date yesterday or today
      * @return sum of sleep time by date
      */
@@ -140,5 +149,49 @@ public class SleepTimeService {
         }).orElseThrow(SleepTimePeriodException::new);
     }
 
+    public StringBuilder getSleepTimeBetweenDates(LocalDate dateFrom) {
+        System.out.println("Inside BetweenDates method");
+//        V.4. WORKS
+//        System.out.println(dateFrom);
+//        System.out.println(LocalDate.now());
+        List<Object[]> result = sleepTimeRepository.findSleepTimeByDates(dateFrom, LocalDate.now());
+//        System.out.println("Received data from DB");
+//        System.out.println(result);
+
+//        List<SleepTimeSummary> sleepTimeByDates = new ArrayList<>();
+//        for (Object[] i : result) {
+//            Date date = (Date) i[0];
+//            PGInterval time = (PGInterval) i[1];
+//            SleepTimeSummary timeSummary = new SleepTimeSummary(date.toLocalDate(), time);
+//            sleepTimeByDates.add(timeSummary);
+//        }
+//
+//        for (SleepTimeSummary sleepTimeSummary : sleepTimeByDates) {
+//            System.out.println(sleepTimeSummary);
+//        }
+
+        List<SleepTimeSummary> sleepTimeByDate = result.stream()
+                .map(i -> {
+                    Date date = (Date) i[0];
+                    PGInterval time = (PGInterval) i[1];
+                    return new SleepTimeSummary(date.toLocalDate(), time);
+                })
+                .toList();
+
+//        for (SleepTimeSummary sleepTimeSummary : A) {
+//            System.out.println(sleepTimeSummary);
+//        }
+
+        StringBuilder answer = new StringBuilder();
+
+        for (SleepTimeSummary sleepTimeSummary : sleepTimeByDate) {
+            answer.append(String.format(sleepTimeSummary.toString() + "\n"));
+        }
+
+        return answer;
+
+    }
+
 
 }
+

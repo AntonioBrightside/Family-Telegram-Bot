@@ -13,6 +13,9 @@ import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +49,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 long messageId = update.message().messageId();
 
                 long replyMessageId = replyMessageId(update);
-//                if (update.message().replyToMessage() != null) {
+//                if (update.message().replyToMessage() != null) {  // TODO: DELETE?
 //                    replyMessageId = update.message().replyToMessage().messageId();
 //                }
 
@@ -54,13 +57,17 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                     // To check if the user is allowed to use bot
                     if (Arrays.stream(allowedUsers).anyMatch(id -> update.message().chat().id() == id)) {
 
-                        String answer = Arrays.stream(Command.values())
-                                .filter(command -> command.getTextCommand().equals(messageText))
-                                .findFirst()
-                                .map(Command::action)
-                                .orElseGet(() -> sleepTimeService.parseUserMessage(messageText, messageId, replyMessageId));
-
-                        sendMessage(chatId, answer);
+//                        String answer = Arrays.stream(Command.values())
+//                                .filter(command -> command.getTextCommand().equals(messageText))
+//                                .findFirst()
+//                                .map(Command::action)
+//                                .orElseGet(() -> sleepTimeService.parseUserMessage(messageText, messageId, replyMessageId));
+//
+//                        sendMessage(chatId, answer);
+                        System.out.println("I'm in the bot"); //TODO: новая фича
+                        sendMessage(chatId,
+                                sleepTimeService.getSleepTimeBetweenDates(LocalDate.now().minusDays(1)).toString());
+//                        sleepTimeService.getSleepTimeBetweenDates(LocalDate.now().minusDays(1));
 
                     } else {
                         sendMessage(chatId, "доступ запрещён");
@@ -73,7 +80,10 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
             });
         } catch (Exception e) {
-            e.getStackTrace();
+            System.out.println("EXCEPTION: " + e.getMessage());
+            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                System.out.println(stackTraceElement);
+            }
         }
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
